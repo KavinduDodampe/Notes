@@ -37,19 +37,50 @@ public class NotesApp {
         // Notes Panel
         JPanel notesPanel = new JPanel();
         notesPanel.setBorder(BorderFactory.createTitledBorder("Notes"));
-        notesPanel.setLayout(new BoxLayout(notesPanel, BoxLayout.Y_AXIS));
+        notesPanel.setLayout(new GridBagLayout()); // Use GridBagLayout for fine-grained control
 
-        JTextField titleField = new JTextField(20);  // Text field for the note title
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.anchor = GridBagConstraints.WEST;
+
+        JLabel titleLabel = new JLabel("Title:");
+        notesPanel.add(titleLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        JTextField titleField = new JTextField(20); // Fixed preferred size
+        titleField.setMaximumSize(new Dimension(200, 25)); // Prevents the text field from expanding
+        notesPanel.add(titleField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.NONE;
+
+        JLabel contentLabel = new JLabel("Content:");
+        notesPanel.add(contentLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        gbc.fill = GridBagConstraints.BOTH;
+
         JTextArea noteArea = new JTextArea(10, 40);  // Text area for the note content
-        JButton addNoteButton = new JButton("Add Note");
-        JButton viewNotesButton = new JButton("View Notes");
+        notesPanel.add(new JScrollPane(noteArea), gbc);
 
-        notesPanel.add(new JLabel("Title:"));
-        notesPanel.add(titleField);
-        notesPanel.add(new JLabel("Content:"));
-        notesPanel.add(new JScrollPane(noteArea));
-        notesPanel.add(addNoteButton);
-        notesPanel.add(viewNotesButton);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 1;
+        gbc.fill = GridBagConstraints.NONE;
+
+        JButton addNoteButton = new JButton("Add Note");
+        notesPanel.add(addNoteButton, gbc);
+
+        gbc.gridx = 1;
+        JButton viewNotesButton = new JButton("View Notes");
+        notesPanel.add(viewNotesButton, gbc);
 
         mainPanel.add(notesPanel);
 
