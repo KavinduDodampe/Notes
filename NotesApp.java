@@ -37,7 +37,7 @@ public class NotesApp {
         // Notes Panel
         JPanel notesPanel = new JPanel();
         notesPanel.setBorder(BorderFactory.createTitledBorder("Notes"));
-        notesPanel.setLayout(new GridBagLayout()); // Use GridBagLayout for fine-grained control
+        notesPanel.setLayout(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -51,7 +51,7 @@ public class NotesApp {
         gbc.gridx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        JTextField titleField = new JTextField(20); // Fixed preferred size
+        JTextField titleField = new JTextField(20);
         titleField.setMaximumSize(new Dimension(200, 25)); // Prevents the text field from expanding
         notesPanel.add(titleField, gbc);
 
@@ -124,12 +124,58 @@ public class NotesApp {
                     JOptionPane.showMessageDialog(frame, "No notes to display.");
                     return;
                 }
-                StringBuilder allNotes = new StringBuilder();
+
+                // Create a dialog to display the notes with Edit and Delete buttons
+                JDialog viewNotesDialog = new JDialog(frame, "View Notes", true);
+                viewNotesDialog.setSize(500, 400);
+                viewNotesDialog.setLayout(new BoxLayout(viewNotesDialog.getContentPane(), BoxLayout.Y_AXIS));
+
                 for (Note note : notes) {
-                    allNotes.append("Title: ").append(note.getTitle()).append("\n")
-                            .append("Content: ").append(note.getContent()).append("\n\n");
+                    JPanel notePanel = new JPanel(new BorderLayout());
+                    JTextArea noteTextArea = new JTextArea("Title: " + note.getTitle() + "\nContent: " + note.getContent());
+                    noteTextArea.setEditable(false);
+                    notePanel.add(noteTextArea, BorderLayout.CENTER);
+
+                    JPanel buttonPanel = new JPanel();
+                    JButton editButton = new JButton("Edit");
+                    JButton deleteButton = new JButton("Delete");
+
+                    // Edit button action
+                    editButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            String newTitle = JOptionPane.showInputDialog(viewNotesDialog, "Edit Title:", note.getTitle());
+                            String newContent = JOptionPane.showInputDialog(viewNotesDialog, "Edit Content:", note.getContent());
+                            if (newTitle != null && newContent != null) {
+                                note.setTitle(newTitle);
+                                note.setContent(newContent);
+                                noteTextArea.setText("Title: " + newTitle + "\nContent: " + newContent);
+                                JOptionPane.showMessageDialog(viewNotesDialog, "Note updated!");
+                            }
+                        }
+                    });
+
+                    // Delete button action
+                    deleteButton.addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            int confirm = JOptionPane.showConfirmDialog(viewNotesDialog, "Are you sure you want to delete this note?");
+                            if (confirm == JOptionPane.YES_OPTION) {
+                                notesManager.deleteNote(note);
+                                viewNotesDialog.dispose(); // Close the dialog and reopen to refresh the notes list
+                                viewNotesButton.doClick();  // Simulate a click on the "View Notes" button
+                            }
+                        }
+                    });
+
+                    buttonPanel.add(editButton);
+                    buttonPanel.add(deleteButton);
+                    notePanel.add(buttonPanel, BorderLayout.EAST);
+
+                    viewNotesDialog.add(notePanel);
                 }
-                JOptionPane.showMessageDialog(frame, allNotes.toString());
+
+                viewNotesDialog.setVisible(true);
             }
         });
 
